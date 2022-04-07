@@ -27,3 +27,6 @@ Cuvântar is an application which allows users to enhance their vocabulary skill
  - AWS EC2 instances for hosting the applications
  - Version control using git
  - CI/CD using Jenkins (maybe??)
+
+## UML diagram
+![alt text](https://github.com/mihai261/cuvantar-backend/blob/main/UML_diagram.png)
