@@ -1,9 +1,6 @@
 package com.pad.cuvantar.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -11,7 +8,7 @@ import java.util.Objects;
 @Table(name = "review")
 public class ReviewModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     int user_id;
