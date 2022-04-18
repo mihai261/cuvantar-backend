@@ -62,5 +62,13 @@ public class FlashcardModel {
         return Objects.hash(id, front, back, definition);
     }
 
-
+    @Override
+    public String toString() {
+        return "FlashcardModel{" +
+                "id=" + id +
+                ", front='" + front + '\'' +
+                ", back='" + back + '\'' +
+                ", definition='" + definition + '\'' +
+                '}';
+    }
 }

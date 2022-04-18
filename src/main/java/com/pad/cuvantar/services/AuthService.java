@@ -1,5 +1,6 @@
 package com.pad.cuvantar.services;
 
+import com.pad.cuvantar.exceptions.UserNotFoundException;
 import com.pad.cuvantar.models.AuthSessionModel;
 import com.pad.cuvantar.models.UserModel;
 import com.pad.cuvantar.repositories.AuthSessionRepository;
@@ -11,7 +12,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
@@ -30,7 +30,6 @@ public class AuthService {
     public String encodePassword(String password, String saltString){
         byte[] hash = new byte[0];
         try{
-            SecureRandom random = new SecureRandom();
             byte[] salt = saltString.getBytes(StandardCharsets.UTF_8);
 
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
@@ -64,21 +63,26 @@ public class AuthService {
         authSessionRepository.save(au);
     }
 
-    public void deleteSession(String username){
+    public void deleteSession(String username) throws UserNotFoundException {
         AuthSessionModel session = getByUsername(username);
         authSessionRepository.deleteById(session.getId());
     }
 
-    private AuthSessionModel getByUsername(String username) throws RuntimeException {
+    private AuthSessionModel getByUsername(String username) throws UserNotFoundException {
         List<AuthSessionModel> result = authSessionRepository.findByUsername(username);
-        if(result.size() == 0) throw new RuntimeException();
+        if(result.size() == 0) throw new UserNotFoundException(String.format("User %s does not exist", username));
         return result.get(0);
     }
 
-    public boolean checkUsernameAndEmailExist(String username, String email){
+    public boolean checkUsernameExists(String username){
         List<UserModel> resultUsername = userRepository.findByUsername(username);
+
+        return resultUsername.size() != 0;
+    }
+
+    public boolean checkEmailExists(String email){
         List<UserModel> resultEmail = userRepository.findByEmail(email);
 
-        return resultEmail.size() != 0 || resultUsername.size() != 0;
+        return resultEmail.size() != 0;
     }
 }
