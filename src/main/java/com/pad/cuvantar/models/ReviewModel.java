@@ -1,7 +1,7 @@
 package com.pad.cuvantar.models;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -14,7 +14,7 @@ public class ReviewModel {
     int user_id;
     int card_id;
     int level;
-    LocalDateTime due_date;
+    Timestamp due_date;
 
     public ReviewModel() {
     }
@@ -51,11 +51,11 @@ public class ReviewModel {
         this.level = level;
     }
 
-    public LocalDateTime getDue_date() {
+    public Timestamp getDue_date() {
         return due_date;
     }
 
-    public void setDue_date(LocalDateTime due_date) {
+    public void setDue_date(Timestamp due_date) {
         this.due_date = due_date;
     }
 
