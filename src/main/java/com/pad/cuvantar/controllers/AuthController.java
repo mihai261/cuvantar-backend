@@ -3,17 +3,13 @@ package com.pad.cuvantar.controllers;
 import com.pad.cuvantar.exceptions.*;
 import com.pad.cuvantar.models.AuthSessionModel;
 import com.pad.cuvantar.models.UserModel;
-import com.pad.cuvantar.repositories.UserRepository;
 import com.pad.cuvantar.services.AuthService;
 import com.pad.cuvantar.services.UserService;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")

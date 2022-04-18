@@ -1,6 +1,5 @@
 package com.pad.cuvantar.services;
 
-import com.pad.cuvantar.exceptions.UserAlreadyExistsException;
 import com.pad.cuvantar.exceptions.UserNotFoundException;
 import com.pad.cuvantar.models.UserModel;
 import com.pad.cuvantar.repositories.UserRepository;
