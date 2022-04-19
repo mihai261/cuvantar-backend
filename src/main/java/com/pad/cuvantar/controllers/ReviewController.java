@@ -7,7 +7,9 @@ import com.pad.cuvantar.exceptions.UserNotFoundException;
 import com.pad.cuvantar.models.ReviewModel;
 import com.pad.cuvantar.services.AuthService;
 import com.pad.cuvantar.services.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,7 +26,8 @@ public class ReviewController {
     @Resource
     ReviewService reviewService;
 
-    @GetMapping("/find")
+    @Operation(summary = "Get all available review items for a user")
+    @GetMapping(value="/find", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ReviewModel> getReviewsForUser(@RequestParam String username, @RequestHeader("custom-token") String token) throws UserNotFoundException, InvalidTokenException {
 
         if (!authService.checkAuthToken(username, token)) throw new InvalidTokenException("Provided token is invalid");
@@ -32,6 +35,7 @@ public class ReviewController {
         return reviewService.getReviewsForUser(username);
     }
 
+    @Operation(summary = "Create or update a review item")
     @PatchMapping("/modify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateReview(@RequestParam String username,

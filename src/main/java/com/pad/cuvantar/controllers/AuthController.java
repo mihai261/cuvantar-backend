@@ -2,10 +2,13 @@ package com.pad.cuvantar.controllers;
 
 import com.pad.cuvantar.exceptions.*;
 import com.pad.cuvantar.models.AuthSessionModel;
+import com.pad.cuvantar.models.AuthTokenModel;
 import com.pad.cuvantar.models.UserModel;
 import com.pad.cuvantar.services.AuthService;
 import com.pad.cuvantar.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,8 +24,9 @@ public class AuthController {
     @Resource
     UserService userService;
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) throws SessionException, InvalidCredentialsException, UserNotFoundException {
+    @Operation(summary = "Start a new auth session")
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AuthTokenModel login(@RequestParam String username, @RequestParam String password) throws SessionException, InvalidCredentialsException, UserNotFoundException {
         if(authService.checkAuthSessionExists(username)) throw new SessionException("Session already exists");
 
         UserModel dbuser = userService.getByUsername(username);
@@ -35,15 +39,16 @@ public class AuthController {
 
             authService.saveAuthSession(authSession);
 
-            return token;
+            return new AuthTokenModel(token);
         }
 
         throw new InvalidCredentialsException("Specified credentials are invalid");
     }
 
+    @Operation(summary = "Terminate an existing auth session")
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@RequestParam String username, @RequestParam String token) throws UserNotFoundException, InvalidTokenException, SessionException {
+    public void logout(@RequestParam String username, @RequestHeader("custom-token") String token) throws UserNotFoundException, InvalidTokenException, SessionException {
         if(!authService.checkAuthSessionExists(username)) throw new SessionException("Session does not exists");
 
         if(authService.checkAuthToken(username, token)){
@@ -54,7 +59,8 @@ public class AuthController {
         throw new InvalidTokenException("Invalid token for this operation");
     }
 
-    @PostMapping("/register")
+    @Operation(summary = "Create a new user")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel addUser(@RequestBody UserModel user) throws UserAlreadyExistsException, EmailAlreadyExistsException {
         if(authService.checkUsernameExists(user.getUsername())) throw new UserAlreadyExistsException(String.format("An account with username %s already exists", user.getUsername()));
 
