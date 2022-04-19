@@ -8,6 +8,7 @@ import com.pad.cuvantar.models.ReviewModel;
 import com.pad.cuvantar.services.AuthService;
 import com.pad.cuvantar.services.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/review")
+@SecurityRequirement(name = "cuvantar-api")
 public class ReviewController {
 
     @Resource
