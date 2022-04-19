@@ -1,9 +1,8 @@
 package com.pad.cuvantar.services;
 
-import  com.pad.cuvantar.models.FlashcardModel;
-import com.pad.cuvantar.repositories.AuthSessionRepository;
+import com.pad.cuvantar.exceptions.UserNotFoundException;
+import com.pad.cuvantar.models.FlashcardModel;
 import com.pad.cuvantar.repositories.FlashcardRepository;
-import com.pad.cuvantar.repositories.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,11 +17,11 @@ public class LessonService {
     @Resource
     UserService userService;
 
-    public List<FlashcardModel> getNewLesson(String username) {
+    public List<FlashcardModel> getNewLesson(String username) throws UserNotFoundException{
 
         int userId = userService.getByUsername(username).getId();
 
-        return flashcardRepository.findUnusedFlashCardForUser(userId);
+        return flashcardRepository.findCardForUser(userId);
     }
 
 

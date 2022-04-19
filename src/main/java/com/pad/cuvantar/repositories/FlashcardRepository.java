@@ -11,5 +11,5 @@ import java.util.List;
 public interface FlashcardRepository extends JpaRepository<FlashcardModel, Integer> {
 
     @Query(value = "SELECT * FROM flashcard LEFT JOIN review ON review.card_id = flashcard.id AND review.user_id = ?1 WHERE review.card_id IS NULL LIMIT 5", nativeQuery = true)
-    List<FlashcardModel> findUnusedFlashCardForUser(Integer userId);
+    List<FlashcardModel> findCardForUser(Integer userId);
 }
