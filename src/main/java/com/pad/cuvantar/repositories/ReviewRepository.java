@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -25,5 +25,5 @@ public interface ReviewRepository extends JpaRepository<ReviewModel, Integer> {
     @Transactional
     @Query(value = "UPDATE review SET level = ?2, due_date = ?3 WHERE id = ?1",
             nativeQuery = true)
-    void updateReview(Integer reviewId, Integer level, LocalDateTime dueDate);
+    void updateReview(Integer reviewId, Integer level, Timestamp dueDate);
 }

@@ -1,11 +1,14 @@
 package com.pad.cuvantar.services;
 
+import com.pad.cuvantar.exceptions.ReviewAlreadyExistsException;
+import com.pad.cuvantar.exceptions.ReviewNotFoundException;
+import com.pad.cuvantar.exceptions.UserNotFoundException;
 import com.pad.cuvantar.models.ReviewModel;
 import com.pad.cuvantar.repositories.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -14,12 +17,12 @@ public class ReviewService {
     private static final int MAX_LEVEL = 5;
     // 6 hours -> 1 day -> 2 days -> 1 week -> 2 weeks -> 1 month(ish)
     private static final long[] INTERVAL = {
-            6L,
-            24L,
-            48L,
-            168L,
-            336L,
-            730L,
+            21600000L,
+            86400000L,
+            172800000L,
+            604800000L,
+            1209600000L,
+            2628000000L,
     };
 
     @Resource
@@ -28,18 +31,17 @@ public class ReviewService {
     @Resource
     UserService userService;
 
-    public List<ReviewModel> getReviewsForUser(String username) {
+    public List<ReviewModel> getReviewsForUser(String username) throws UserNotFoundException {
         int userId = userService.getByUsername(username).getId();
 
         return reviewRepository.findReviewsForUser(userId);
     }
 
-    public void createReviewForUser(String username, int cardId) {
+    public void createReviewForUser(String username, int cardId) throws UserNotFoundException, ReviewAlreadyExistsException {
         int userId = userService.getByUsername(username).getId();
 
-        // review already exists
         if (reviewRepository.findReviewByUserAndCard(userId, cardId) != null) {
-            throw new RuntimeException();
+            throw new ReviewAlreadyExistsException("Review already exists for user " + username + " and card " + cardId);
         }
 
         ReviewModel review = new ReviewModel();
@@ -51,12 +53,12 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public void updateReviewForUser(String username, int cardId, Boolean passed) {
+    public void updateReviewForUser(String username, int cardId, Boolean passed) throws UserNotFoundException, ReviewNotFoundException {
         int userId = userService.getByUsername(username).getId();
 
         ReviewModel review = reviewRepository.findReviewByUserAndCard(userId, cardId);
-        // review doesn't exist
-        if (review == null) throw new RuntimeException();
+
+        if (review == null) throw new ReviewNotFoundException("Review not found for user " + username + " and card " + cardId);
 
         int level = review.getLevel();
         if (passed) {
@@ -68,8 +70,7 @@ public class ReviewService {
         reviewRepository.updateReview(review.getId(), level, calculateDueDate(level));
     }
 
-    private LocalDateTime calculateDueDate(int level) {
-        LocalDateTime crtTime = LocalDateTime.now();
-        return crtTime.plusHours(INTERVAL[level]);
+    private Timestamp calculateDueDate(int level) {
+        return new Timestamp(System.currentTimeMillis() + INTERVAL[level]);
     }
 }

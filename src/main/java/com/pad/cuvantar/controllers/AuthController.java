@@ -1,20 +1,23 @@
 package com.pad.cuvantar.controllers;
 
+import com.pad.cuvantar.exceptions.*;
 import com.pad.cuvantar.models.AuthSessionModel;
+import com.pad.cuvantar.models.AuthTokenModel;
 import com.pad.cuvantar.models.UserModel;
-import com.pad.cuvantar.repositories.UserRepository;
 import com.pad.cuvantar.services.AuthService;
 import com.pad.cuvantar.services.UserService;
-import org.apache.catalina.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
+@SecurityRequirement(name = "cuvantar-api")
 public class AuthController {
 
     @Resource
@@ -23,9 +26,10 @@ public class AuthController {
     @Resource
     UserService userService;
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) throws RuntimeException {
-        if(authService.checkAuthSessionExists(username)) throw new RuntimeException();
+    @Operation(summary = "Start a new auth session")
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AuthTokenModel login(@RequestParam String username, @RequestParam String password) throws SessionException, InvalidCredentialsException, UserNotFoundException {
+        if(authService.checkAuthSessionExists(username)) throw new SessionException("Session already exists");
 
         UserModel dbuser = userService.getByUsername(username);
         if(authService.encodePassword(password, username).equals(dbuser.getPassword())){
@@ -37,28 +41,32 @@ public class AuthController {
 
             authService.saveAuthSession(authSession);
 
-            return token;
+            return new AuthTokenModel(token);
         }
 
-        throw new RuntimeException();
+        throw new InvalidCredentialsException("Specified credentials are invalid");
     }
 
+    @Operation(summary = "Terminate an existing auth session")
     @PostMapping("/logout")
-    public void logout(@RequestParam String username, @RequestParam String token) throws RuntimeException {
-        if(!authService.checkAuthSessionExists(username)) throw new RuntimeException();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestParam String username, @RequestHeader("custom-token") String token) throws UserNotFoundException, InvalidTokenException, SessionException {
+        if(!authService.checkAuthSessionExists(username)) throw new SessionException("Session does not exists");
 
-        UserModel dbuser = userService.getByUsername(username);
         if(authService.checkAuthToken(username, token)){
             authService.deleteSession(username);
             return;
         }
 
-        throw new RuntimeException();
+        throw new InvalidTokenException("Invalid token for this operation");
     }
 
-    @PostMapping("/register")
-    public UserModel addUser(@RequestBody UserModel user) throws RuntimeException {
-        if(authService.checkUsernameAndEmailExist(user.getUsername(), user.getEmail())) throw new RuntimeException();
+    @Operation(summary = "Create a new user")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel addUser(@RequestBody UserModel user) throws UserAlreadyExistsException, EmailAlreadyExistsException {
+        if(authService.checkUsernameExists(user.getUsername())) throw new UserAlreadyExistsException(String.format("An account with username %s already exists", user.getUsername()));
+
+        if(authService.checkEmailExists(user.getEmail())) throw new EmailAlreadyExistsException(String.format("An account with email %s already exists", user.getEmail()));
 
         user.setPassword(authService.encodePassword(user.getPassword(), user.getUsername()));
 
