@@ -1,29 +1,28 @@
 package com.pad.cuvantar.services;
 
+import ch.qos.logback.classic.pattern.DateConverter;
 import com.pad.cuvantar.exceptions.ReviewAlreadyExistsException;
 import com.pad.cuvantar.exceptions.ReviewNotFoundException;
 import com.pad.cuvantar.exceptions.UserNotFoundException;
 import com.pad.cuvantar.models.ReviewModel;
 import com.pad.cuvantar.repositories.ReviewRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
 public class ReviewService {
 
     private static final int MAX_LEVEL = 5;
-    // 6 hours -> 1 day -> 2 days -> 1 week -> 2 weeks -> 1 month(ish)
-    private static final long[] INTERVAL = {
-            21600000L,
-            86400000L,
-            172800000L,
-            604800000L,
-            1209600000L,
-            2628000000L,
-    };
+
+    @Value("${cuvantar.intervals}")
+    private List<Long> intervals;
 
     @Resource
     ReviewRepository reviewRepository;
@@ -71,6 +70,6 @@ public class ReviewService {
     }
 
     private Timestamp calculateDueDate(int level) {
-        return new Timestamp(System.currentTimeMillis() + INTERVAL[level]);
+        return new Timestamp(System.currentTimeMillis() + intervals.get(level));
     }
 }

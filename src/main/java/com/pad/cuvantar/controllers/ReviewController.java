@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/review")
+@RequestMapping("/api")
 @SecurityRequirement(name = "cuvantar-api")
 public class ReviewController {
 
@@ -29,7 +29,7 @@ public class ReviewController {
     ReviewService reviewService;
 
     @Operation(summary = "Get all available review items for a user")
-    @GetMapping(value="/find", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ReviewModel> getReviewsForUser(@RequestParam String username, @RequestHeader("custom-token") String token) throws UserNotFoundException, InvalidTokenException {
 
         if (!authService.checkAuthToken(username, token)) throw new InvalidTokenException("Provided token is invalid");
@@ -38,7 +38,7 @@ public class ReviewController {
     }
 
     @Operation(summary = "Create or update a review item")
-    @PatchMapping("/modify")
+    @PatchMapping("/reviews")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateReview(@RequestParam String username,
                              @RequestParam int cardId,
