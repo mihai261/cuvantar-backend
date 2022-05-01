@@ -6,9 +6,11 @@ import com.pad.cuvantar.models.FlashcardModel;
 import com.pad.cuvantar.services.FlashcardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -18,22 +20,17 @@ public class FlashcardController {
     @Resource
     FlashcardService flashcardService;
 
-    @Operation(summary = "Get a card by the specified ID")
+    @Operation(summary = "Get a flashcard by the specified ID")
     @GetMapping("/cards/{id}")
     public FlashcardModel getCardById(@PathVariable int id) throws FlashcardNotFoundException {
         return flashcardService.getCardById(id);
     }
 
-    @Operation(summary = "Get a list of cards matching the specified keyword on front or back")
-    @GetMapping("/cards/search")
-    public List<FlashcardModel> searchForCards(@RequestParam String keyword, @RequestParam(defaultValue = "true", required = false) boolean searchByFront)
+    @Operation(summary = "Get a list of all the existing flashcards")
+    @GetMapping("/cards")
+    public List<FlashcardModel> getAllCards()
     {
-        if(searchByFront) {
-            return flashcardService.getCardByFront(keyword);
-        }
-        else{
-            return flashcardService.getCardByBack(keyword);
-        }
+        return flashcardService.getAll();
     }
 
     @Operation(summary = "Add a new flashcard")
@@ -42,5 +39,12 @@ public class FlashcardController {
         if(flashcardService.checkCardExists(flashcard)) throw new FlashcardAlreadyExistsException(String.format("Flashcard with front %s already exists", flashcard.getFront()));
 
         return flashcardService.addFlashcard(flashcard);
+    }
+
+    @Operation(summary = "Delete a flashcard")
+    @DeleteMapping("/cards/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFlashcard(@PathVariable int id) throws FlashcardNotFoundException {
+        flashcardService.deleteFlashcard(id);
     }
 }

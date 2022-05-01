@@ -38,7 +38,7 @@ public class ReviewController {
     }
 
     @Operation(summary = "Create or update a review item")
-    @PatchMapping("/reviews")
+    @PostMapping("/reviews")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateReview(@RequestParam String username,
                              @RequestParam int cardId,
