@@ -12,4 +12,7 @@ public interface FlashcardRepository extends JpaRepository<FlashcardModel, Integ
 
     @Query(value = "SELECT * FROM flashcard LEFT JOIN review ON review.card_id = flashcard.id AND review.user_id = ?1 WHERE review.card_id IS NULL LIMIT 5", nativeQuery = true)
     List<FlashcardModel> findCardForUser(Integer userId);
+
+    @Query(value = "SELECT * FROM flashcard WHERE flashcard.front = ?1", nativeQuery = true)
+    List<FlashcardModel> findCardByFront(String front);
 }

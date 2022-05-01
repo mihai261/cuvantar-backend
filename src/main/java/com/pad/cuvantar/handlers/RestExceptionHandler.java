@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class RestExceptionHandler {
     @ResponseBody
-    @ExceptionHandler(value = {UserNotFoundException.class, ReviewNotFoundException.class})
+    @ExceptionHandler(value = {UserNotFoundException.class, ReviewNotFoundException.class, FlashcardNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     RestExceptionModel notFoundExceptionHandler(Exception e){
         return new RestExceptionModel(e.getMessage());
@@ -33,7 +33,7 @@ public class RestExceptionHandler {
     }
 
     @ResponseBody
-    @ExceptionHandler(value = {UserAlreadyExistsException.class, EmailAlreadyExistsException.class, ReviewAlreadyExistsException.class})
+    @ExceptionHandler(value = {UserAlreadyExistsException.class, EmailAlreadyExistsException.class, ReviewAlreadyExistsException.class, FlashcardAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     RestExceptionModel conflictHandler(Exception e){
         return new RestExceptionModel(e.getMessage());
