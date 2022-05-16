@@ -1,0 +1,1 @@
+ALTER TABLE auth_session ADD created_at timestamp;

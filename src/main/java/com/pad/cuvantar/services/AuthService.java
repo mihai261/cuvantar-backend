@@ -5,6 +5,8 @@ import com.pad.cuvantar.models.AuthSessionModel;
 import com.pad.cuvantar.models.UserModel;
 import com.pad.cuvantar.repositories.AuthSessionRepository;
 import com.pad.cuvantar.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +28,9 @@ public class AuthService {
 
     @Resource
     AuthSessionRepository authSessionRepository;
+
+    @Value("${cuvantar.auth.expiration}")
+    String expirationDeltaString;
 
     public String encodePassword(String password, String saltString){
         byte[] hash = new byte[0];
@@ -63,13 +68,26 @@ public class AuthService {
         authSessionRepository.save(au);
     }
 
-    public void deleteSession(String username) throws UserNotFoundException {
-        AuthSessionModel session = getByUsername(username);
+    public void deleteSession(String username, String token) throws UserNotFoundException {
+        AuthSessionModel session = getByUsernameAndToken(username, token);
         authSessionRepository.deleteById(session.getId());
     }
 
-    private AuthSessionModel getByUsername(String username) throws UserNotFoundException {
-        List<AuthSessionModel> result = authSessionRepository.findByUsername(username);
+    @Scheduled(fixedRateString="${cuvantar.auth.refresh.rate}", initialDelay = 1000)
+    public void cleanupAuthSessions() throws UserNotFoundException {
+        List<AuthSessionModel> authSessions = authSessionRepository.findAll();
+
+        for(AuthSessionModel s : authSessions){
+            if((System.currentTimeMillis() - s.getCreated_at().getTime()) >= Long.parseLong(expirationDeltaString)){
+                deleteSession(s.getUsername(), s.getToken());
+            }
+        }
+    }
+
+    private AuthSessionModel getByUsernameAndToken(String username, String token) throws UserNotFoundException {
+        List<AuthSessionModel> result = authSessionRepository.findByUsername(username)
+                .stream().filter(x -> x.getToken().equals(token))
+                .collect(Collectors.toList());
         if(result.size() == 0) throw new UserNotFoundException(String.format("User %s does not exist", username));
         return result.get(0);
     }

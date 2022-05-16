@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @RestController
@@ -28,9 +29,7 @@ public class AuthController {
 
     @Operation(summary = "Start a new auth session")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AuthTokenModel login(@RequestParam String username, @RequestParam String password) throws SessionException, InvalidCredentialsException, UserNotFoundException {
-        if(authService.checkAuthSessionExists(username)) throw new SessionException("Session already exists");
-
+    public AuthTokenModel login(@RequestParam String username, @RequestParam String password) throws InvalidCredentialsException, UserNotFoundException {
         UserModel dbuser = userService.getByUsername(username);
         if(authService.encodePassword(password, username).equals(dbuser.getPassword())){
             AuthSessionModel authSession = new AuthSessionModel();
@@ -38,6 +37,7 @@ public class AuthController {
             authSession.setToken(token);
             authSession.setUser_id(dbuser.getId());
             authSession.setUsername(dbuser.getUsername());
+            authSession.setCreated_at(new Timestamp(System.currentTimeMillis()));
 
             authService.saveAuthSession(authSession);
 
@@ -54,7 +54,7 @@ public class AuthController {
         if(!authService.checkAuthSessionExists(username)) throw new SessionException("Session does not exists");
 
         if(authService.checkAuthToken(username, token)){
-            authService.deleteSession(username);
+            authService.deleteSession(username, token);
             return;
         }
 

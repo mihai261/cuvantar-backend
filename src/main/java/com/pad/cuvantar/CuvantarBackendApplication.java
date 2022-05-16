@@ -7,14 +7,14 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "Cuvantar", description = "Some long and useful description which I didn't bother writing...", version = "v1"))
 @SecurityScheme(name = "cuvantar-api", scheme = "basic", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
+@EnableScheduling
 public class CuvantarBackendApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(CuvantarBackendApplication.class, args);
 	}
-
 }
