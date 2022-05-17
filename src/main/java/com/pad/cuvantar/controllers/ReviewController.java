@@ -35,7 +35,7 @@ public class ReviewController {
         if (!authService.checkAuthToken(username, token)) throw new InvalidTokenException("Provided token is invalid");
 
         if(recent.isPresent()){
-            reviewService.getReviewsForUser(username, recent.get());
+            return reviewService.getReviewsForUser(username, recent.get());
         }
         return reviewService.getReviewsForUser(username);
     }
