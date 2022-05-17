@@ -1,6 +1,5 @@
 package com.pad.cuvantar.services;
 
-import ch.qos.logback.classic.pattern.DateConverter;
 import com.pad.cuvantar.exceptions.ReviewAlreadyExistsException;
 import com.pad.cuvantar.exceptions.ReviewNotFoundException;
 import com.pad.cuvantar.exceptions.UserNotFoundException;
@@ -11,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -33,7 +29,14 @@ public class ReviewService {
     public List<ReviewModel> getReviewsForUser(String username) throws UserNotFoundException {
         int userId = userService.getByUsername(username).getId();
 
-        return reviewRepository.findReviewsForUser(userId);
+        return reviewRepository.findDueReviewsForUser(userId);
+    }
+
+    public List<ReviewModel> getReviewsForUser(String username, Boolean recent) throws UserNotFoundException {
+        int userId = userService.getByUsername(username).getId();
+
+        if(!recent) return reviewRepository.findDueReviewsForUser(userId);
+        else return reviewRepository.findNewestReviewsForUser(userId);
     }
 
     public void createReviewForUser(String username, int cardId) throws UserNotFoundException, ReviewAlreadyExistsException {

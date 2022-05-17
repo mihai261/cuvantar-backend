@@ -15,7 +15,11 @@ public interface ReviewRepository extends JpaRepository<ReviewModel, Integer> {
 
     @Query(value = "SELECT * FROM review WHERE user_id = ?1 AND due_date < now()",
             nativeQuery = true)
-    List<ReviewModel> findReviewsForUser(Integer userId);
+    List<ReviewModel> findDueReviewsForUser(Integer userId);
+
+    @Query(value = "SELECT * FROM review WHERE user_id = ?1 ORDER BY id DESC LIMIT 10",
+            nativeQuery = true)
+    List<ReviewModel> findNewestReviewsForUser(Integer userId);
 
     @Query(value = "SELECT * FROM review WHERE user_id = ?1 AND card_id = ?2",
             nativeQuery = true)

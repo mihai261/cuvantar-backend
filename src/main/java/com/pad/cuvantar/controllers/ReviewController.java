@@ -30,10 +30,13 @@ public class ReviewController {
 
     @Operation(summary = "Get all available review items for a user")
     @GetMapping(value="/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ReviewModel> getReviewsForUser(@RequestParam String username, @RequestHeader("custom-token") String token) throws UserNotFoundException, InvalidTokenException {
+    public List<ReviewModel> getReviewsForUser(@RequestParam String username, @RequestHeader("custom-token") String token, @RequestParam  Optional<Boolean> recent) throws UserNotFoundException, InvalidTokenException {
 
         if (!authService.checkAuthToken(username, token)) throw new InvalidTokenException("Provided token is invalid");
 
+        if(recent.isPresent()){
+            reviewService.getReviewsForUser(username, recent.get());
+        }
         return reviewService.getReviewsForUser(username);
     }
 
