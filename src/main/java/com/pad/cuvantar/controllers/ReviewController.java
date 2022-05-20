@@ -20,6 +20,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "cuvantar-api")
+@CrossOrigin(origins = "*")
 public class ReviewController {
 
     @Resource

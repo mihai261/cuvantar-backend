@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "cuvantar-api")
+@CrossOrigin(origins = "*")
 public class FlashcardController {
     @Resource
     FlashcardService flashcardService;

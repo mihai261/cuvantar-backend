@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "cuvantar-api")
+@CrossOrigin(origins = "*")
 public class LessonsController {
 
     @Resource
