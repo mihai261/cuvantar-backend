@@ -13,20 +13,20 @@ Cuvântar is an application which allows users to enhance their vocabulary skill
  - There will be 3 applications: the web app, the mobile app and the backend server
  - There will be 2 main actors: the web app user and the mobile app user
  - Both users can start new vocabulary lessons, review vocabulary items and search through all their vocabulary items
- - Additionally, users will be able to manage their account from the web app
  - The backend server will include an API with a graphic interface (e.g. Swagger) which allows the introduction of new entities in the database
 
   
 
 ## Technologies
 
- - Spring Boot 2 application for the backend
+ - Spring Boot 2 for the backend
  - React for the frontend
- - Ionic mobile app (using the React code base from above)
- - MySQL database
- - AWS EC2 instances for hosting the applications
+ - Ionic for the mobile app (using the React code base from above)
+ - MySQL database, hosted on AWS RDS
+ - AWS EC2 for hosting Spring Boot app
+ - AWS Amplify for hosting React app
+ - AWS RDS for hosting database
  - Version control using git
- - CI/CD using Jenkins (maybe??)
 
 ## UML diagram
 ![alt text](https://github.com/mihai261/cuvantar-backend/blob/main/UML_diagram.png)
